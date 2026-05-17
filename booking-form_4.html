@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Activity Booking Form</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --border: #E2DDD6;
+    --border-strong: #C8C2B8;
+    --text: #1A1816;
+    --text-muted: #7A746C;
+    --accent: #2B5EA7;
+    --accent-light: #EBF1FA;
+    --success: #1A6644;
+    --success-bg: #EDFAF3;
+    --danger: #991F1F;
+    --danger-bg: #FDF0F0;
+    --info-border: #378ADD;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 3rem 1rem 4rem;
+  }
+
+  .page { width: 100%; max-width: 520px; }
+
+  .header { margin-bottom: 2.5rem; }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+  .header p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .field { margin-bottom: 1.25rem; }
+  .field:last-child { margin-bottom: 0; }
+
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .field input:focus { border-color: var(--accent); background: #fff; }
+  .field input::placeholder { color: var(--text-muted); }
+
+  .loc-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.625rem;
+    cursor: pointer;
+    background: var(--bg);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .loc-card:last-child { margin-bottom: 0; }
+  .loc-card:hover:not(.full) { border-color: var(--border-strong); background: #fff; }
+  .loc-card.selected { border: 2px solid var(--info-border); background: var(--accent-light); }
+  .loc-card.full { opacity: 0.4; cursor: not-allowed; }
+
+  .loc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .loc-name { font-size: 15px; font-weight: 500; color: var(--text); }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 100px;
+    letter-spacing: 0.02em;
+  }
+  .b-open { background: var(--success-bg); color: var(--success); }
+  .b-full { background: var(--danger-bg); color: var(--danger); }
+  .b-load { background: var(--border); color: var(--text-muted); }
+
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-bg { flex: 1; height: 3px; border-radius: 2px; background: var(--border); }
+  .bar-fill { height: 3px; border-radius: 2px; background: var(--accent); transition: width 0.4s ease; }
+  .bar-label { font-size: 12px; color: var(--text-muted); white-space: nowrap; min-width: 80px; text-align: right; }
+
+  .tr-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .tr-row:first-of-type { border-top: 1px solid var(--border); }
+  .tr-label { font-size: 14px; color: var(--text); line-height: 1.4; max-width: 240px; }
+
+  .tog {
+    display: flex;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .tog button {
+    padding: 6px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: background 0.12s, color 0.12s;
+  }
+  .tog button.on { background: var(--text); color: #fff; }
+
+  .submit-btn {
+    width: 100%;
+    padding: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 1.25rem;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .submit-btn:hover:not(:disabled) { opacity: 0.85; }
+  .submit-btn:active:not(:disabled) { transform: scale(0.99); }
+  .submit-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .err-msg {
+    font-size: 13px;
+    color: var(--danger);
+    margin-top: 8px;
+    display: none;
+    padding: 8px 12px;
+    background: var(--danger-bg);
+    border-radius: 8px;
+  }
+
+  .loading-line {
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .spin {
+    width: 14px; height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .ok-card {
+    background: var(--success-bg);
+    border: 1px solid #A8DCC5;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    display: none;
+  }
+  .ok-icon {
+    width: 48px; height: 48px;
+    background: var(--success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: #fff;
+    font-size: 22px;
+  }
+  .ok-title { font-family: 'DM Serif Display', serif; font-size: 1.5rem; font-weight: 400; color: var(--success); margin-bottom: 0.5rem; }
+  .ok-sub { font-size: 14px; color: var(--success); line-height: 1.6; }
+  .ok-detail { margin-top: 1.25rem; background: rgba(255,255,255,0.6); border-radius: 10px; padding: 0.875rem 1rem; }
+  .ok-detail p { font-size: 13px; color: var(--success); margin-bottom: 4px; }
+  .ok-detail p:last-child { margin-bottom: 0; }
+  .ok-detail strong { font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <h1>Activity Booking</h1>
+    <p>Complete the form below to secure your spot. Availability updates in real time.</p>
+  </div>
+
+  <div id="theForm">
+    <div class="card">
+      <div class="section-label">Your details</div>
+      <div class="field">
+        <label for="fname">Full name</label>
+        <input type="text" id="fname" placeholder="e.g. Tan Wei Ming" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="femail">Email address</label>
+        <input type="email" id="femail" placeholder="e.g. weiming@school.edu.sg" autocomplete="email" />
+      </div>
+      <div class="err-msg" id="err-fields">Please fill in all fields above.</div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Choose a location</div>
+      <div class="loading-line" id="loadMsg"><div class="spin"></div> Loading availability...</div>
+
+      <div id="loc-sdc" class="loc-card" onclick="selectLoc('sdc')" style="display:none;" role="button" tabindex="0">
+        <div class="loc-head">
+          <span class="loc-name">Singapore Discovery Centre</span>
+          <span class="badge b-load" id="badge-sdc">—</span>
+        </div>
+        <div class="bar-row">
+          <div class="bar-bg"><div class="bar-fill" id="bar-sdc" style="width:0%"></div></div>
+          <span class="bar-label" id="spots-sdc">Loading...</span>
+        </div>
+      </div>
+
+      <div id="loc-som" class="loc-card" onclick="selectLoc('som')" style="display:none;" role="button" tabindex="0">
+        <div class="loc-head">
+          <span class="loc-name">Somerset</span>
+          <span class="badge b-load" id="badge-som">—</span>
+        </div>
+        <div class="bar-row">
+          <div class="bar-bg"><div class="bar-fill" id="bar-som" style="width:0%"></div></div>
+          <span class="bar-label" id="spots-som">Loading...</span>
+        </div>
+      </div>
+
+      <div class="err-msg" id="err-loc">Please select a location.</div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Transport options</div>
+      <div class="tr-row">
+        <span class="tr-label">Transport to venue from school</span>
+        <div class="tog">
+          <button class="on" id="to-yes" onclick="setT('to','yes')">Yes</button>
+          <button id="to-no" onclick="setT('to','no')">No</button>
+        </div>
+      </div>
+      <div class="tr-row" style="border-bottom:none;">
+        <span class="tr-label">Transport from venue back to school</span>
+        <div class="tog">
+          <button class="on" id="from-yes" onclick="setT('from','yes')">Yes</button>
+          <button id="from-no" onclick="setT('from','no')">No</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="err-msg" id="err-api" style="margin-top:0;">Submission failed. Please check your connection and try again.</div>
+    <button class="submit-btn" id="subBtn" onclick="submitForm()">Confirm booking</button>
+  </div>
+
+  <div class="ok-card" id="okBox">
+    <div class="ok-icon">✓</div>
+    <div class="ok-title">Booking confirmed!</div>
+    <div class="ok-sub">Your spot has been reserved. See you there.</div>
+    <div class="ok-detail" id="okDetail"></div>
+  </div>
+</div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx3CSdFRpWa0d15Kxt4KObFjRgxhvqeoiSlHB07Vh7XjPNGIPX6A8y7OFTzPCkOLIt7WQ/exec";
+  const CAPS = { sdc: 80, som: 50 };
+  const LOC_NAMES = { sdc: "Singapore Discovery Centre", som: "Somerset" };
+  let counts = { sdc: 0, som: 0 };
+  let selectedLoc = null;
+  let transport = { to: "yes", from: "yes" };
+  let submitting = false;
+
+  async function loadCounts() {
+    try {
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      counts.sdc = data["Singapore Discovery Centre"]?.booked || 0;
+      counts.som = data["Somerset"]?.booked || 0;
+    } catch(e) {
+      counts.sdc = 0; counts.som = 0;
+    }
+    document.getElementById("loadMsg").style.display = "none";
+    ["sdc","som"].forEach(k => document.getElementById("loc-" + k).style.display = "block");
+    renderCards();
+  }
+
+  function renderCards() {
+    ["sdc","som"].forEach(k => {
+      const cap = CAPS[k], booked = counts[k], rem = cap - booked;
+      const pct = Math.round((booked / cap) * 100);
+      const card = document.getElementById("loc-" + k);
+      const badge = document.getElementById("badge-" + k);
+      document.getElementById("spots-" + k).textContent = rem + " of " + cap + " left";
+      document.getElementById("bar-" + k).style.width = pct + "%";
+      if (rem <= 0) {
+        badge.textContent = "Full"; badge.className = "badge b-full";
+        card.classList.add("full"); card.classList.remove("selected");
+        if (selectedLoc === k) selectedLoc = null;
+      } else {
+        badge.textContent = "Open"; badge.className = "badge b-open";
+        card.classList.remove("full");
+      }
+    });
+  }
+
+  function selectLoc(k) {
+    if (counts[k] >= CAPS[k]) return;
+    selectedLoc = k;
+    document.getElementById("loc-sdc").classList.toggle("selected", k === "sdc");
+    document.getElementById("loc-som").classList.toggle("selected", k === "som");
+    document.getElementById("err-loc").style.display = "none";
+  }
+
+  function setT(dir, val) {
+    transport[dir] = val;
+    document.getElementById(dir + "-yes").classList.toggle("on", val === "yes");
+    document.getElementById(dir + "-no").classList.toggle("on", val === "no");
+  }
+
+  async function submitForm() {
+    if (submitting) return;
+    const name = document.getElementById("fname").value.trim();
+    const email = document.getElementById("femail").value.trim();
+    ["err-fields","err-loc","err-api"].forEach(id => document.getElementById(id).style.display = "none");
+
+    if (!name || !email) { document.getElementById("err-fields").style.display = "block"; return; }
+    if (!selectedLoc) { document.getElementById("err-loc").style.display = "block"; return; }
+
+    submitting = true;
+    const btn = document.getElementById("subBtn");
+    btn.disabled = true; btn.textContent = "Submitting...";
+
+    const payload = {
+      name, email,
+      location: LOC_NAMES[selectedLoc],
+      transportTo: transport.to === "yes" ? "Yes" : "No",
+      transportFrom: transport.from === "yes" ? "Yes" : "No"
+    };
+
+    try {
+      const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById("okDetail").innerHTML =
+          "<p><strong>Name:</strong> " + name + "</p>" +
+          "<p><strong>Location:</strong> " + LOC_NAMES[selectedLoc] + "</p>" +
+          "<p><strong>Transport to venue:</strong> " + payload.transportTo + "</p>" +
+          "<p><strong>Transport back to school:</strong> " + payload.transportFrom + "</p>";
+        document.getElementById("theForm").style.display = "none";
+        document.getElementById("okBox").style.display = "block";
+      } else if (data.reason === "full") {
+        counts[selectedLoc] = CAPS[selectedLoc];
+        renderCards(); selectedLoc = null;
+        document.getElementById("err-loc").textContent = "This location just filled up. Please choose another.";
+        document.getElementById("err-loc").style.display = "block";
+        btn.disabled = false; btn.textContent = "Confirm booking"; submitting = false;
+      } else { throw new Error(); }
+    } catch(e) {
+      document.getElementById("err-api").style.display = "block";
+      btn.disabled = false; btn.textContent = "Confirm booking"; submitting = false;
+    }
+  }
+
+  document.querySelectorAll(".loc-card").forEach(card => {
+    card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); card.click(); } });
+  });
+
+  loadCounts();
+</script>
+</body>
+</html>
